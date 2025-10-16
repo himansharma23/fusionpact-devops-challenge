@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_USER = "Himansh2k3"        // Replace with your Docker Hub username
+        BACKEND_IMG = "${DOCKER_USER}/fastapi-backend:latest"
+        FRONTEND_IMG = "${DOCKER_USER}/static-frontend:latest"
+        EC2_USER = "root"
+        EC2_HOST = "ec2-13.232.43.186.compute.amazonaws.com" // Replace with your EC2 public IP
+        EC2_PATH = "/root/fusionpact-devops-challenge"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/himansharma23/fusionpact-devops-challenge.git'
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh "docker build -t ${BACKEND_IMG} ./backend"
+                sh "docker build -t ${FRONTEND_IMG} ./frontend"
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'Himansh2k3', passwordVariable: 'Himansh@23#')]) {
+                    sh """
+                    echo $PASS | docker login -u $USER --password-stdin
+                    docker push ${BACKEND_IMG}
+                    docker push ${FRONTEND_IMG}
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+                sshagent(['first.pem']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
+                        cd ${EC2_PATH}
+                        git pull origin main
+                        docker pull ${BACKEND_IMG}
+                        docker pull ${FRONTEND_IMG}
+                        docker compose down
+                        docker compose up -d
+                        echo "✅ Deployment completed!"
+                    EOF
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo "🎉 CI/CD pipeline executed successfully!" }
+        failure { echo "❌ CI/CD pipeline failed. Check the logs." }
+    }
+}
