@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    volumes:
+      - ./data:/app/app/data
 
   frontend:
     image: himansh2k3/fusionpact-frontend:latest
