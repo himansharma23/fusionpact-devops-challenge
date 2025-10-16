@@ -26,8 +26,8 @@ pipeline {
             steps {
                 sh 'sed -i "s|image: himansh2k3/fusionpact-backend:.*|image: himansh2k3/fusionpact-backend:${BUILD_ID}|g" docker-compose.yml'
                 sh 'sed -i "s|image: himansh2k3/fusionpact-frontend:.*|image: himansh2k3/fusionpact-frontend:${BUILD_ID}|g" docker-compose.yml'
-                sh 'docker-compose pull backend frontend'
-                sh 'docker-compose up -d'
+                sh 'sudo docker-compose pull backend frontend'
+                sh 'sudo docker-compose up -d'
 
             }
         }
