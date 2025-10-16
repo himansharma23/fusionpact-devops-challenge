@@ -2,25 +2,25 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USER = "himansh2k3"        // Replace with your Docker Hub username
-        BACKEND_IMG = "${himansh2k3}/fastapi-backend:latest"
-        FRONTEND_IMG = "${himansh2k3}/static-frontend:latest"
-        EC2_USER = "root"
-        EC2_HOST = "ec2-13-232-43-186.ap-south-1.compute.amazonaws.com" // Replace with your EC2 public IP
-        EC2_PATH = "/root/fusionpact-devops-challenge"
+        DOCKER_USER = "himansh2k3"          // Replace with your Docker Hub username
+        BACKEND_IMG = "${DOCKER_USER}/fastapi-backend:latest"
+        FRONTEND_IMG = "${DOCKER_USER}/static-frontend:latest"
+        EC2_USER = "root"                                // You said you are using root
+        EC2_HOST = "13.232.43.186"                 // Replace with your EC2 public IP
+        EC2_PATH = "/root/fusionpact-devops-challenge"  // Path to repo on EC2
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/himansharma23/fusionpact-devops-challenge.git'
+                git branch: 'main', url: 'https://github.com/<yourusername>/fusionpact-devops-challenge.git'
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                sh "docker build -t ${fusionpact-devops-challenge-backend} ./backend"
-                sh "docker build -t ${fusionpact-devops-challenge-frontend} ./frontend"
+                sh "docker build -t ${BACKEND_IMG} ./backend"
+                sh "docker build -t ${FRONTEND_IMG} ./frontend"
             }
         }
 
@@ -29,8 +29,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'himansh2k3', passwordVariable: 'Himansh@23#')]) {
                     sh """
                     echo $PASS | docker login -u $USER --password-stdin
-                    docker push ${fusionpact-devops-challenge-backend}
-                    docker push ${fusionpact-devops-challenge-frontend}
+                    docker push ${BACKEND_IMG}
+                    docker push ${FRONTEND_IMG}
                     """
                 }
             }
@@ -38,7 +38,7 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['first.pem']) {
+                sshagent(['ec2-ssh-key']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
                         cd ${EC2_PATH}
@@ -47,16 +47,10 @@ pipeline {
                         docker pull ${FRONTEND_IMG}
                         docker compose down
                         docker compose up -d
-                        echo "✅ Deployment completed!"
                     EOF
                     """
                 }
             }
         }
-    }
-
-    post {
-        success { echo "🎉 CI/CD pipeline executed successfully!" }
-        failure { echo "❌ CI/CD pipeline failed. Check the logs." }
     }
 }
