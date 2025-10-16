@@ -17,11 +17,11 @@ pipeline {
 
         stage('Image Push') {
             steps {
-                sh 'sudo docker push himansh2k3/fusionpact-backend:$BUILD_ID .'
-                sh 'sudo docker push himansh2k3/fusionpact-frontend:$BUILD_ID .'
+                sh 'sudo docker push himansh2k3/fusionpact-backend:$BUILD_ID'
+                sh 'sudo docker push himansh2k3/fusionpact-frontend:$BUILD_ID'
             }
         }
         
-        
+
     }
 }
