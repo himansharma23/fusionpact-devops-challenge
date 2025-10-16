@@ -21,7 +21,5 @@ pipeline {
                 sh 'sudo docker push himansh2k3/fusionpact-frontend:$BUILD_ID'
             }
         }
-        
-
     }
 }
