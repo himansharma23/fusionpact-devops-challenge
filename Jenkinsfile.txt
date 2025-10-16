@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USER = "Himansh2k3"        // Replace with your Docker Hub username
+        DOCKER_USER = "himansh2k3"        // Replace with your Docker Hub username
         BACKEND_IMG = "${DOCKER_USER}/fastapi-backend:latest"
         FRONTEND_IMG = "${DOCKER_USER}/static-frontend:latest"
         EC2_USER = "root"
@@ -26,7 +26,7 @@ pipeline {
 
         stage('Push Docker Images') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'Himansh2k3', passwordVariable: 'Himansh@23#')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'himansh2k3', passwordVariable: 'Himansh@23#')]) {
                     sh """
                     echo $PASS | docker login -u $USER --password-stdin
                     docker push ${BACKEND_IMG}
