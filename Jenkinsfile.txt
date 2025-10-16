@@ -3,10 +3,10 @@ pipeline {
 
     environment {
         DOCKER_USER = "himansh2k3"        // Replace with your Docker Hub username
-        BACKEND_IMG = "${DOCKER_USER}/fastapi-backend:latest"
-        FRONTEND_IMG = "${DOCKER_USER}/static-frontend:latest"
+        BACKEND_IMG = "${himansh2k3}/fastapi-backend:latest"
+        FRONTEND_IMG = "${himansh2k3}/static-frontend:latest"
         EC2_USER = "root"
-        EC2_HOST = "ec2-13.232.43.186.compute.amazonaws.com" // Replace with your EC2 public IP
+        EC2_HOST = "ec2-13-232-43-186.ap-south-1.compute.amazonaws.com" // Replace with your EC2 public IP
         EC2_PATH = "/root/fusionpact-devops-challenge"
     }
 
@@ -19,8 +19,8 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh "docker build -t ${BACKEND_IMG} ./backend"
-                sh "docker build -t ${FRONTEND_IMG} ./frontend"
+                sh "docker build -t ${fusionpact-devops-challenge-backend} ./backend"
+                sh "docker build -t ${fusionpact-devops-challenge-frontend} ./frontend"
             }
         }
 
@@ -29,8 +29,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'himansh2k3', passwordVariable: 'Himansh@23#')]) {
                     sh """
                     echo $PASS | docker login -u $USER --password-stdin
-                    docker push ${BACKEND_IMG}
-                    docker push ${FRONTEND_IMG}
+                    docker push ${fusionpact-devops-challenge-backend}
+                    docker push ${fusionpact-devops-challenge-frontend}
                     """
                 }
             }
